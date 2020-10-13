@@ -152,7 +152,7 @@ For the second condition:
 > This is easy to prove using the independence definition: $X$ and $Y$ are independent **iff** $P\{X \in S_X, Y\in S_Y\} = P\{X \in S_X\}P\{Y \in S_Y\}$, a detailed proof can be seen at [here](https://math.stackexchange.com/questions/8742/are-functions-of-independent-variables-also-independent).
 
 For the first condition:
-Proof:
+**Proof**:
 
 >$<a_i, z> \mod 2 = \sum_{j=1}^{m} a_{ij} * z_j \mod 2$
 >
@@ -237,9 +237,9 @@ Then we will create a second level of buckets for this bucket, ranging: $\{0, ..
 
 **Performance analysis**:
 
-Claim: $\mathbb{E}_h \{\sum_i load(i) ^ 2\} \le O(|u|)$, $h$ is the hash function.
+**Claim**: $\mathbb{E}_h \{\sum_i load(i) ^ 2\} \le O(|u|)$, $h$ is the hash function.
 
-Proof: 
+**Proof**: 
 $$
 \begin{align*}
 &\mathbb{E}_h \{\sum_i load(i) ^ 2\} \\
@@ -264,5 +264,4 @@ $$
 [gperf](https://www.gnu.org/software/gperf/manual/gperf.html): a perfect hash function generator
 
 
-​    
 ​    

@@ -146,8 +146,8 @@ Because the right side (RHS) of the equation is always 0 but left is always 1.
 A universal hash function, usually prefixed by $k$, reading "k-universal hash functions", satisfies:
 
 1. $h_R(x)$ is a random hash function.
+2. 
 
-2.
 $$
 \forall \{x_1, ..., x_k\} \subseteq u, (y_1, ..., y_k) \in m \qquad P_{h_R \in \mathcal{H}}\{h(x_1) = y_1 \wedge\ ...\ \wedge h(x_k) = y_k\} \le |m|^{-k}
 $$
