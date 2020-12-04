@@ -119,8 +119,23 @@ $$
 \mathbb{E} \max_i \ load(i) \sim O(k) = O(\frac{logn}{loglogn})
 $$
 
+**Proof:**
 
-> Proof for $c'(\frac{e}{k})^k * n$ approximates 0 when $k = \frac{c^* logn}{loglogn}$ :
+We would like $c'(\frac{e}{k})^k * n$ approximates 0, therefore:
+$$
+\begin{align*}
+&\text{needs }(\frac{e}{k})^k = e^{k log \frac{e}{k}} \le \frac{1}{n} \\
+&k log \frac{e}{k} \le -\log n \\
+&k log \frac{k}{e} \ge \log n \\
+&(\text{let } k \ge \frac{c^*\log n}{\log \log n}) \\
+& k log \frac{k}{e} \ge \frac{c^*\log n}{\log \log n} * \log \frac{c^{**}\log n}{\log \log n} 
+\end{align*}
+$$
+since $\log \frac{c^{**}\log n}{\log \log n} = \log \log n + log c^{**} - \log \log \log n$, and $\log \log n$ is the prime factor, with some proper $c*$, we can get $k log \frac{k}{e} \ge \log n$.
+
+> 
+>
+> Side Proof for $c'(\frac{e}{k})^k * n$ approximates 0 when $k = \frac{c^* logn}{loglogn}$ :
 > $$
 > \begin{align*}
 > &c'(\frac{e}{k})^k * n \\
@@ -139,14 +154,14 @@ $$
 >
 > ```
 > def k(n):
->     const = 1According to the rule of "inherit from more specific class", 
->     return const * math.log(n)/math.log(math.log(n))
+>  const = 1
+>  return const * math.log(n)/math.log(math.log(n))
 > 
 > def bound(n):
->     return (math.e/k(n)) ** k(n) * n
+>  return (math.e/k(n)) ** k(n) * n
 > 
 > for i in range(3, 10):
->     print(bound(10**i))
+>  print(bound(10**i))
 > ```
 >
 > Result:
@@ -170,8 +185,6 @@ $$
 > 3.940753770345024e-79
 > 1.7850935085535476e-87
 > ```
->
-> 
 
 ---
 
@@ -192,37 +205,183 @@ $$
 
 Define graph $G$ with its nodes equal to bins. 
 
-T edges, (connect i and j when choose)
+Define $T$ edges, connect node $i$ and $j$ when we compare their load and assign the request,  create edge $i \rightarrow j$ if $load(j) < load(i)$, node $j$ gets the request in this case.
 
-P("ordered" edge (i, j)) = $\frac{1}{n^2}$ at some step a. (because there are n^2 edges, i->j and j->i)
+Then the probability of creating a directed edge between $i$ and $j$ is $P\{i \rightarrow j\} = \frac{1}{n^2}$ (Note: n * n bins include $i \rightarrow j$ and $j \rightarrow i$).
 
-**Lemma 1**: w.h.p. the size (vertex number) of the largest connected component $\le 5 \log n$ (small connected component)
+We will refer to **in** degree of nodes as degree for short.
 
-**Lemma 2**: w.h.p the following holds:
+#### Lemma 1
 
-$\forall S \subseteq V$, (V: vertices set) the average degree in $G[S]$ is at most 5.
+> w.h.p. The size of the largest connected component $\le 5 \log n$ (small connected component).
 
-Lemma 1 + Lemma 2 will prove our theorem:
+#### Lemma 2
 
-If $G$ satisfies Lemma 1 and Lemma 2:
+> w.h.p The following holds:
+>
+> $\forall S \subseteq V$, (V: vertices set) the average degree in $G[S]$ is at most 5. 
+>
 
-Component C, |C| <= 5
+​	
 
-partition vertices in C in O(loglogn) layers: L1, L2, L3, ...
+#### Why Lemma 1 + Lemma 2 is enough
 
-L1 = {v \in C: deg v <= 9 in G[C]}
+If $G$ satisfies Lemma 1 and Lemma 2, let component $C \subseteq G$, partition vertices in $C$ in $O(\log \log n)$ layers: $L_1, L_2, L_3, ...$, where partitions are defined as:
 
-L2 = {v \in C\L1: deg v < 10 in G[C\L1]}
+$$
+L_1 = \{v \in C: \deg v < 10 \in G[C]\} \\
+L_2 = \{v \in C \setminus L_1: \deg v < 10 \in G[C \setminus L1]\} \\
+... \\
+L_i = \{v \in C\setminus \{L_1 \cup ... \cup L_{i-1}\}: \deg v < 10 \in G[C\setminus \{L_1 \cup ... \cup L_{i-1} \}] \}
+$$
 
-...
 
-Li = {v \in C\{L1 \cup ... \cup L_{i-1}}: deg v < 10 in G[C\{L1 \cup ... \cup L_{i-1}}]}
+(Note: by removing previous partitions, like $L_2$ will remove $L_1$, edges pointing to and going from vertices in $L_1$ are also removed, and degrees are induced degrees in the induced graph like $C \setminus L_1$ used in $L_2$ definition)
 
-avg deg in C => |L1| >= |C|/2
+
+
+By Lemma 2 we get $|L_1| \ge \frac{|C|}{2}$, since degree of nodes in $L_1$ are defined to be double the number of max average degree in Lemma 2.
+
+Now use Lemma 2 on $L_2 ... L_i$, we get $|L_2| \ge \frac{|C \setminus L1|}{2}, ..., |L_i| \ge \frac{|C\setminus \{L_1 \cup ... \cup L_{i-1}\}|}{2}$
+
+
+
+Let $S = C\setminus \{L_1 \cup ... \cup L_i\}$, by Markov inequality there is:
+$$
+P_{u \in S}\{\deg u \ge 10\} \le \frac{\mathbb{E}_{u \in S}[\deg u]}{10} \le 1/2
+$$
+
+
+Therefore, we are removing at least half of the nodes in every step. Since the size of the largest connected component is  $\log n$, after $\log \log n$ iterations, we will remove all nodes. And we can conclude that the number of layers will satisfy:
+
+$$
+\# layers \le O(loglogn)
+$$
+
+Now, prove by induction that load of vertices in layer $L_i$ is at most $10 * i$ (So last layer with index $k=\log \log n$, and its load is $10*k = 10\log \log n$).
+
+**Base case**: 
+
+> $i = 1$:  number of requests for vertices in $L_1 \le 10$.
+
+With the definition of $L_1$, all nodes in $L_1$ have $\deg < 10$, even if all requests go to them, they have less than 10 requests.
+
+**Induction step**: 
+
+> If the induced degree for all nodes in $L_i$ is at most $10 * i$, stands $\forall i = 1... i < i+1$, prove that in $L_{i+1}$, the induced degree is at most $10 * (i+1)$.
+
+We can view the assignment process continuously, wait until the load of nodes in $L_{i+1}$ grows to $10 * i$, Then there are two types of requests to consider:
+
+1. Backward requests $(k, i+1), k<i$, since load in previous layers $L_1, ..., L_i$ are lower, they will always go to previous nodes, and and edge $k \leftarrow i+1$ will be created.
+2. Forward requests $(k, i+1), k \ge i$, these types of requests correspond to edges in the induced graph  $C\setminus \{L_1 \cup ... \cup L_i\}$, therefore there are at most 9 such requests according to the definition of partitions.
+
+Therefore, the load of nodes in $L_{i+1} \le 10 * i + 9 < 10 * (i+1)$.
+
+Now it is sufficient to say that:
+$$
+\quad \max_i load(i) \le c*\log\log n​, \forall i \in C
+$$
+The same framework could be applied to all other similar components in $G$.
+
+
+
+#### Common things used to prove Lemma 1 and Lemma 2
+
+Lemma 1 is implied by: 
+
+> For a set $S \in G, |S| = \log n$, then number of edges in $S < |S| - 1$.
+
+Because in this condition, it is not possible to have a connected component with size larger than $\log n$.
+
+If we can prove:
+
+$$
+P\{\exists S, s.t. |S| = m, G[s] \text{ has $k$ edges}\} \ll 1, s.t. m=\log n, k \ge \log n
+$$
+
+
+then we can prove Lemma 1.
+
+
+
+Suppose we choose a fixed set $s^* \in G, |s^*| = m$, then we can get the conditional version on $s^*$ of the probability above:
+
+(Note: actually we need to compute probability for all $k \ge \log n$, but it is quite easy to prove that for larger k, given that $T<\frac{n}{20}$ and $m = 5 \ln n$, this probability is monotonically decreasing.)
+$$
+\begin{align*}
+&P\{G[S] \text{ has $k$ edges} | S=s^*\} \\
+&\text{(union bound, total $T$ edges (requests), k land in $s^*$, $t_k$ is request index)} \\
+&\le \sum_{1 \le t_1 ... t_k \le T} P\{\text{edge at $t_i$ land in $s^*$}\} \\
+&\text{(each edge has two vertices land in $s^*$, |$s^*$| = m, out of total n vertices, total k edges) }\\
+&\le \sum_{1 \le t_1 ... t_k \le T} (\frac{m}{n})^{2k}  \\
+&= {T \choose k} (\frac{m}{n})^{2k} \\
+&\le (\frac{eT}{k})^k * (\frac{m}{n})^{2k} \\
+\end{align*}
+$$
+Therefore we can get an upper bound of the the probability we need:
+$$
+\begin{align*}
+&P\{\exists S, s.t. |S| = m, G[s] \text{ has $k$ edges}\} \\
+&= P\{\cup_{S \subseteq G, |S| = m} \{G[s] \text{ has $k$ edges}\}\} \\
+&\text{(by union bound)} \\
+&\le \sum_{\forall S \subseteq G, |S| = m} P\{G[s] \text{ has $k$ edges}\} \\
+&\le {n \choose m} *  (\frac{eT}{k})^k * (\frac{m}{n})^{2k} \\
+&\le (\frac{en}{m})^m * (\frac{eT}{k})^k * (\frac{m}{n})^{2k}
+\end{align*}
+$$
+
 
 
 
 #### Lemma 1 proof
 
+let $m = \lceil 5\ln n \rceil$
+
+let $k = m - 1$
+
+The the upper bound of the probability above:
+$$
+\begin{align*}
+&P\{\exists S, s.t. |S| = m, G[s] \text{ has $k$ edges}\} \\
+&\le (\frac{en}{m})^m * (\frac{eT}{k})^k * (\frac{m}{n})^{2k} \\
+&\text{(see T value above, at problem definition)} \\
+&=  (\frac{en}{m})^m *  (\frac{n}{e^2 * k})^k * (\frac{m}{n})^{2k} \\
+&= e^{m-2k} * n^{m+k-2k} * m^{2k-m} * k^{-k} \\
+&\le e^{-k + 1} * n * \underbrace{m^{k-1} * k^{-k}}_{(k+1)^{k-1}/k^k < (k+1)^k/k^k = e} \\
+&\le e^{-k} * n * e^2 \\
+&\text{(because $k=m-1 < 5\ln n$ )}\\
+&\le e^2 / n^4 \\
+& \ll 1
+\end{align*}
+$$
+Therefore w.h.p. the size of the largest connected component $\le 5 \log n$.
+
 #### Lemma 2 proof
+
+Consider sets of size $\le 5\log n$ (because for set of size $>5\log n$, they would be disconnected, as described in Lemma 1).
+
+We need to show that $P\{\exists S, G[S] \text{ has $> 2.5|S|$ edges}\} \ll 1$
+
+(Since total degree = # edges * 2, so average degree is at most 5, as described in Lemma 2.)
+
+Let $m \le 5\log n, k=2.5m$, there is:
+
+$$
+\begin{align*}
+&P\{\exists S, s.t. |S| = m, G[s] \text{ has $k$ edges}\} \\
+&\le (\frac{en}{m})^m * (\frac{eT}{k})^k * (\frac{m}{n})^{2k} \\
+&\text{(put in $T, k, m$)} \\
+&=(\frac{m}{n})^{1.5m} * (\underbrace{\frac{e}{(e^2*2.5)^{2.5}}}_{<1})^m \\
+&\ll 1
+\end{align*}
+$$
+
+
+### Real cases
+
+Does this bound holds for larger $T$? Eg: $T=n$?
+
+We can partition total requests $T=n$ to $e^3$ groups (and reset bins after each partition).
+
+The the max load for some bin $< e^3 * c * \log \log n$, and the hyper-log-log bound still holds.
 
