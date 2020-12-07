@@ -1,5 +1,7 @@
 ## Bloom filters
 
+Scribe: Muhan Li
+
 ---
 
 ### Introduction

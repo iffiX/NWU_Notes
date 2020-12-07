@@ -1,5 +1,7 @@
 ## Universal families of hash functions
 
+Scribe: Muhan Li
+
 In this lecture, we will define several common families of 2-universal hash functions.
 
 ---

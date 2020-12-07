@@ -1,5 +1,7 @@
 ## The load balancing problem
 
+Scribe: Muhan Li
+
 ---
 
 ### Introduction

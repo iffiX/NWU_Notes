@@ -1,5 +1,7 @@
 ## Preface to bloom filter
 
+Scribe: Muhan Li
+
 ---
 
 ### Q: Compare two sets 

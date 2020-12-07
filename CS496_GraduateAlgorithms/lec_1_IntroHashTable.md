@@ -1,4 +1,7 @@
 ## Introduction to hash tables
+
+Scribe: Muhan Li
+
 ---
 
 ### Various data structures for mapping storage
