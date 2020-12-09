@@ -50,7 +50,9 @@ Compute the set of coefficients which linearly composes constraints into our min
 
 ![image-20201125015448203](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201125015448203.png)
 
-and c - A^ty and Ax - b must be all 0 or respective x and y must be 0, because (A^ty - c <= 0, vector) and (Ax - b >= 0, vector)
+and c - A^ty and Ax - b must be all 0 or respective x and y must be 0, because (A^ty - c <= 0, vector) and (Ax - b >= 0, vector) 
+
+(complementary slackness is also known as the KKT condition)
 
 ![image-20201125015821501](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201125015821501.png)
 

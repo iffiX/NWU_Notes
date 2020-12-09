@@ -2,7 +2,7 @@
 
 Scribe: Muhan Li
 
-(A large part of this note are copied from this [scribe note](http://www.cs.cmu.edu/afs/cs/academic/class/15750-s17/ScribeNotes/lecture38.pdf) of CMU 15750)
+(A large part of this note is based on this [scribe note](http://www.cs.cmu.edu/afs/cs/academic/class/15750-s17/ScribeNotes/lecture38.pdf) of CMU 15750)
 
 ### Introduction
 

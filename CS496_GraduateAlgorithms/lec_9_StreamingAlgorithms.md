@@ -1,5 +1,7 @@
 ## Streaming algorithms
 
+Scribe: Muhan Li
+
 ### Introduction
 
 (Quoted from [wiki](https://en.wikipedia.org/wiki/Streaming_algorithm))
