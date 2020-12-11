@@ -1,5 +1,39 @@
 ## Online Algorithms
 
+Scribe: Muhan Li
+
+Benefitial readings: 
+
+[Online Algorithms by Borodin et al.](docs/draft-ch1-8.pdf)
+
+[WISC CS787 note](docs/lecture20.pdf)
+
+### Introduction
+
+Online algorithms are designed to deal with input piece by piece in the order they are fed, which means it may make decisions resulting in sub-optimal final outcomes. In contrast, an offline algorithm is given the whole problem data from the beginning, which means it is possible to compute a globally optimal solution.
+
+Therefore,  we use [competitive analysis](https://en.wikipedia.org/wiki/Competitive_analysis_(online_algorithm)) to formally compare the relative performance of an online and (optimal) offline algorithm for the same problem instance. More formally:
+
+For a minimization problem:
+
+
+$$
+ALG(I) \le C * OPT(I)
+$$
+Where:
+
+1. $C$ - competitive factor, $C \ge 1$.
+2. $ALG(I)$ - cost of some problem instance returned by our algorithm
+3. $OPT(I)$ - cost returned by the optimal solution.
+
+For a maximization problem:
+$$
+ALG(I) \ge C * OPT(I)
+$$
+Where $C \le 1$.
+
+We are usually using the biggest $C$ for all instances $I$ in a minimization problem and the largest $C$ for a maximization problem. We usually use "n-competitive" as a shorter form of saying "competitive ratio is n".
+
 ### Ski rental problem
 
 Scenario 1:
@@ -15,18 +49,6 @@ Allow buying in the middle, rent some days before buying it
 *** Yale's minimax principle
 
 Theorem: There exists a 2-competitive (2 is competitive ratio) algorithm for ski rental defined by parameters (A, B, set of {ski days})
-
-competitive ratio = max_I cost_alg(I) / cost_opt(I)
-
-I -> instance of your problem
-
-alg(I) <= C * opt(I)
-
-(definition is for minimization algorithm, deterministic)
-
-(For maximization algorithm, (1/alpha is another representation of something smaller than 1, with alpha >= 1):)
-
-![image-20201104013535259](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201104013535259.png)
 
 Proof of theorem:
 
