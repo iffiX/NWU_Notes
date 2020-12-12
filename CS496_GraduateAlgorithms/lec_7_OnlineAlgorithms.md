@@ -36,112 +36,191 @@ We are usually using the biggest $C$ for all instances $I$ in a minimization pro
 
 ### Ski rental problem
 
-Scenario 1:
+We would like to move from position X to Y for some $n$ days, we can either:
 
-from position X to Y, either by skis for B dollars, or rent skis for A dollars / day.
+1.  Rent a ski for $A$ dollars / day.
+2.  Buy a ski permanently for B dollars, 
 
-Ski n times:	Rent: A * n dollars, Buy: B, select min(A * n, B)
+Usually, we normalize both costs and divide them by $A$, get $A'=1$ and $B' = B/A$ to simplify our analysis.
 
-Scenario 2:
+#### Deterministic solution
 
-Allow buying in the middle, rent some days before buying it
+**Algorithm**:
 
-*** Yale's minimax principle
+> Day 1~$\lfloor B \rfloor$, rent ski with cost 1.
+>
+> Day $\lceil B \rceil$, buy ski with cost $B$.
 
-Theorem: There exists a 2-competitive (2 is competitive ratio) algorithm for ski rental defined by parameters (A, B, set of {ski days})
+**Theorem**: 
 
-Proof of theorem:
+This algorithm is 2-competitive.
 
-let A = 1; B is integer
+**Proof**:
 
-Algorithm: we rent for the first (B-1) days.
-
-On day B, we buy skis
-
-Need to show: alg(I) <= 2 * Opt(I)
-
-
-
-let n be the # of days we ski, opt = min(n, B)
+Let $n$ be the number of days we ski, then $OPT = min(n, B)$.
 
 For our algorithm there are two cases:
 
-a. n < B, cost is n
+1. $n < B$, cost is $n$. 
+2. $n \geq \lceil B \rceil$, cost is $\lfloor B \rfloor + B$.
 
-b. n>= B cost is 2B-1
+When $n < B$, competitive ratio is 1.
 
-if n > 2B we are done
+When $n \geq \lceil B \rceil$, the competitive ratio is:
+$$
+\frac{ALG(I)}{OPT(I)} = \frac{\lfloor B \rfloor + B}{B} \leq \frac{2B}{B} = 2
+$$
 
-let I = {1,...,n}
+#### Randomized solution
 
-Alg(I) = (n-1)*1 + B = (B-1) + n
+For a randomized algorithm, we analyze its performance using the expected competitive ratio:
+$$
+\text{competitive ratio} \leq \max_I \frac{\mathbb{E}[ALG(I)]}{OPT(I)}
+$$
+And we say that the algorithm is n-competitive if $\forall I, \mathbb{E}[ALG(I)] \leq n *OPT(I)$
 
-opt(I) = min(B, n)
+**Algorithm**:
 
-alg(I) / opt(I) >= 2 * (B-1)/B = 2 (1 - 1/B)
+Define probability distribution with density function:
+$$
+f(x) = \frac{e^{x/B}}{B(e-1)}, x>0
+$$
+We sample $t$ according to this distribution and buys the ski on day $\lceil t \rceil$.
 
-![image-20201028011335860](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201028011335860.png)
+**Theorem**: 
 
-Theorem 2:
+This algorithm is $\frac{e}{e-1}$-competitive (approximately 1.58).
 
-Exists randomized algorithm with competitive ratio:
+**Proof**:
 
-![image-20201028011610045](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201028011610045.png)
+The cumulative distribution function is:
+$$
+\begin{align*}
+F(x) &= P\{T \leq x\} \\
+&= \int_0^x f(t)\,dt \\
+&= \int_0^x \frac{e^{t/B}}{B(e-1)} \,dt \\
+&= \frac{1}{e-1} (e^{t/B} \Big|_0^x) \\
+&= \frac{e^{x/B}-1}{e-1}
+\end{align*}
+$$
 
-![image-20201028013227094](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201028013227094.png)
+1. When $n \leq B$:
 
-![image-20201028014200301](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201028014200301.png)
+   Cost of the optimal solution is $OPT = n$.
 
-![image-20201030004009732](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201030004009732.png)
+   Expectation cost of our algorithm is:
+   $$
+   \begin{align*}
+   \mathbb{E}[ALG] &= \mathbb{E}[\text{rental cost}] + \mathbb{E}[\text{buy cost}] \\
+   &= \mathbb{E}[\int_0^n \mathbb{I}\{\text{we rent at time $t$}\}\,dt] + \underbrace{P\{T \leq n\}}_{\text{we buy }\leq n} * B \\
+   &\leq \int_0^nP\{\text{we rent at time $t$}\}\,dt + P\{T \leq n\} * B
+   \end{align*}
+   $$
+   Note we use inequality $\leq$ instead of equality in the last equation, because we are converting discrete renting events to contiguous events (the last day we rent was $\lfloor t_0 \rfloor$ originally, but now it is $t_0$).
 
-![image-20201030004656036](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201030004656036.png)
+   Therefore:
+   $$
+   \begin{align*}
+   &\int_0^nP\{\text{we rent at time $t$}\}\,dt + P\{T \leq n\} * B \\
+   &=\int_0^nP\{T \geq t\}\,dt + P\{T \leq n\} * B \\
+   &=\int_0^n (1-\frac{e^{t/B}-1}{e-1}) \,dt + P\{T \leq n\} * B \\
+   &=n-\frac{B(e^{n/B}-1)}{e-1} + \frac{n}{e-1} - \frac{B(e^{n/B}-1)}{e-1} \\
+   &=(1+\frac{1}{e-1}) n \\
+   &=\frac{e}{e-1}n
+   \end{align*}
+   $$
+   And competitive ratio of the randomized algorithm is $\frac{e}{e-1}$.
 
-## LRU Caching
+2. When $n > B$:
 
-LRU policy: keeps track of when page was requestes / used last time. Removed the least used page.
+   Since event $T \in [0, B]$ happens with probability 1 according to the cumulative distribution function (let $x=B$ in $F(x)=\frac{e^{x/B}-1}{e-1}$), which means we will always buy the ski $\leq B$, and these cases are equivalent to the $n=B$ case, and the competitive ratio is still $\frac{e}{e-1}$.
 
-Theorem: LRU is k-competitive. (k is cache size in page number)
+#### Why randomization helps (Yao's Lemma)
 
-ALG(I) <= k * OPT(I)
+According to [Yao's minimax principle](https://en.wikipedia.org/wiki/Yao%27s_principle):
 
-![image-20201030010922375](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201030010922375.png)
+> The worst-case expected cost of the randomized algorithm is at least the cost of the best deterministic algorithm against input distribution $q$.
 
-![image-20201030011850143](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201030011850143.png)
+A more straight forward explanation is that randomly guessing (Eg: evict a page that probably will not be used in the future) has some probability of being correct. While the performance of a deterministic algorithm depends on the occurring probability of the worst sequences.
 
-We request pages from a pool of k pages
+### Caching problem
 
-LRU makes <= k cache misses
+#### The LRU algorithm
 
-![image-20201030012926163](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201030012926163.png)
+**Algorithm**:
 
-![image-20201030013404304](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201030013404304.png)
+Keeps a increasing rank number.
 
+When any page is missed, fetch it from storage, removed the page with the smallest rank, then assign the latest rank to the new fetched page and store it in cache.
 
+When any page is hit, assign it the latest rank.
 
-### Beyond worst-case analysis (BWCA)
+**Theorem**:
 
-(There are many ways to perform BWCA, we will use Resource augmentation here, 
+LRU is $k$-competitive. ($k$ is cache size in page number)
 
-We are using this price (augmented resource) to analyze how well our algorithm can perform compared to the optimum situation which we will not be able to reach)
+**Proof**:
 
-LRU vs OPT
+(Note: this is the proof talked in class, however there are also many other similar proofs talked about in courses offered by other universities such as this [one](https://www.cs.princeton.edu/~wayne/cs423/lectures/competitive-4up.pdf))
 
-suppose LRU is working with a cache size slightly bigger than the OPT algorithm, eg: 2k pages
+We first prove that LRU has competitive ratio $\leq k$, then show that it has competitive ratio $\geq k$, then conclude that its competitive ratio is $k$.
 
-LRU - 2k, OPT - k (2 could be some number = 1 + $\epsilon$)
+##### Theorem 1
 
-(because in most cases LRU is dealing with more complex scenarios than an offline scenario)
+LRU has $C\leq k$.
 
-Theorem: LRU is 2-competitive in resource augmentation
+**Proof**:
 
-Proof:
+We partition the sequence into phases, a phase immediately starts when $OPT$ has made one page fault, and ends 	before the next $OPT$ page fault.
 
-also split runtime into blocks, where each block have 2k distinct page requests (Note the same page could be requested multiple times)
+Each phase has at most $k$ **distinct** pages, otherwise two page faults will occur and this contradicts our definition.
 
-![image-20201104015130230](/home/Administrator/iffi/.config/Typora/typora-user-images/image-20201104015130230.png)
+Let $p$ be some page LRU faults on, we can prove by contradiction that LRU will not fault on $p$ in $k$ distinct pages, because otherwise before faulting on $p$ the second time, LRU should have met with $k$ distinct pages, resulting in $k + 1$ distinct pages in total including $p$, which contradicts the condition.
 
-LRU: if some page is evicted, the page must be some page requested before current time block. (since cache size is 2k), (worst case) evict at most 2k pages
+Therefore LRU has $C \leq k$.
 
-OPT: (has only k pages in cache), (worst case) >= k misses
+##### Theorem 2
 
-therefore it is 2-competitive
+LRU has $C \geq k$
+
+**Proof**:
+
+It is easy to construct the following sequence which repeats every $k+1$ pages:
+$$
+1,2,...,k,k+1,1,2,...,k,k+1,...
+$$
+LRU will fault $k+1$ times in every block of length $k+1$.
+
+$OPT$ will fault 1 time in every block (after first $1,2,...,k$), first fault on $k+1$, then $k$, $k-1$,...... It is straight forward to simulate $OPT$ by removing the latest accessed page in future window of size $k$ and replace it with the missing page.
+
+Therefore LRU has $C \geq k$
+
+With Theorem 1 and 2 we can conclude that LRU is $k$-competitive.
+
+#### Beyond worst-case analysis (BWCA)
+
+There are many ways to perform BWCA, we will use Resource augmentation here.
+
+We are using this price (augmented resource) to analyze how well our algorithm can perform compared to the optimum situation which we will not be able to reach.
+
+##### LRU vs OPT
+
+suppose LRU is working with a cache size slightly bigger than the OPT algorithm, Eg: $2k$ pages, because in most cases LRU is dealing with more complex scenarios than an off-line scenario.
+
+LRU - $2k$, OPT - $k$ (2 could be some number = 1 + $\epsilon$)
+
+**Theorem**: 
+
+LRU is 2-competitive in resource augmentation
+
+**Proof**:
+
+Also split runtime into blocks, where each block have $2k$ distinct page requests.
+
+LRU: 
+
+If some page is evicted, the page must be some page requested before current time block. (since cache size is $2k$), in the worst case evict at most $2k$ pages.
+
+OPT: can only keep $k$ pages in cache, worst case $\geq k$ misses.
+
+therefore it is 2-competitive.
