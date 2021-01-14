@@ -28,6 +28,8 @@ ALG(I) \ge A * OPT(I)
 $$
 Where $A \le 1$
 
+Sometimes people use $\frac{1}{\alpha}$ instead of $\alpha$ or $A$.
+
 ### The edge cover problem
 
 We have talked about this problem in "Parameterized Algorithms", the exact mathematical definition for this problem is:
@@ -88,7 +90,7 @@ let $V_k$ be the set of uncovered elements, and $V_0 = u$.
 >
 > - Find $s_j$ that covers most elements in $V_t$
 > - Add $s_j$ to solution $I$
-> - $V_{t+1} = V_t \setminus S_j$
+> - $V_{t+1} = V_t \setminus s_j$
 >
 > return solution $I$
 
@@ -113,17 +115,17 @@ We can prove a key observation of $V_1$ size $|V_1|$:
 
 We would like to prove $|V_t| \le (1-1/k)^t * n$:
 
-Let the remaining uncovered set be covered by the union of $s_j$: $V_t = \cup_{j,j\leq t}s_j$, then:
+Let the remaining uncovered set be covered by the union of $s_j$ chosen in the future: $V_t = \cup_{j}s_j$, then:
 $$
 \exists j, s.t. |V_t \cap s_j| \geq \frac{|V_t|}{k}
 $$
 Since $OPT(I) = k$ (prove by contradiction).
 
-Finally by induction:
+Finally by induction (note $s_j$ which covers the most uncovered elements is chosen):
 $$
 \begin{align*}
-|V_{t+1}| &\leq |V_T| - |s_j| \\
-&= |V_t| - \frac{|V_t|}{k} \\
+|V_{t+1}| &= |V_t| - |V_t \cap s_j| \\
+&\leq |V_t| - \frac{|V_t|}{k} \\
 &= (1-\frac{1}{k})|V_t| \\
 &\leq(1-\frac{1}{k})*(1-\frac{1}{k})^t*n\\
 &=(1-\frac{1}{k})^{t+1}*n
